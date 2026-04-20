@@ -3,5 +3,4 @@ ktor:
     modules:
       - com.example.ApplicationKt.module
   deployment:
-    # Baris di bawah ini WAJIB ada agar Cloud Run bisa mengatur port-nya sendiri
-    port: ${?PORT}
+    port: 8080
