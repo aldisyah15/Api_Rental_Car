@@ -1,4 +1,5 @@
 # ---------- Stage 1: Build ----------
+# Menggunakan Gradle 8.11 dan JDK 17 sesuai kebutuhan plugin Shadow kamu
 FROM gradle:8.11-jdk17 AS builder
 WORKDIR /app
 
@@ -6,20 +7,22 @@ WORKDIR /app
 COPY . .
 
 # Build fat jar (shadowJar)
-RUN gradle shadowJar --no-daemon
+# Menggunakan ./gradlew lebih disarankan agar versinya konsisten dengan laptopmu
+RUN chmod +x gradlew && ./gradlew shadowJar --no-daemon
 
 # ---------- Stage 2: Run ----------
-FROM eclipse-temurin:17-jdk
+# Menggunakan JRE 17 yang lebih ringan dan stabil
+FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
 
 # Copy hasil build dari stage builder
+# Kita ambil file yang berakhiran -all.jar dan menamainya app.jar
 COPY --from=builder /app/build/libs/*all.jar app.jar
 
-# Port yang digunakan Cloud Run
+# Konfigurasi Port untuk Cloud Run
 ENV PORT=8080
-
-# Expose port
 EXPOSE 8080
 
 # Run aplikasi
+# Menggunakan exec form ["java", "-jar", "app.jar"] adalah best practice
 CMD ["java", "-jar", "app.jar"]
