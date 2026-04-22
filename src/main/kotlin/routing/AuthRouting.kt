@@ -28,7 +28,21 @@ fun Route.authRouting() {
                 println(dataLogin)
                 call.respondText("Berhasil Login", status = HttpStatusCode.OK)
             } catch (e: Exception) {
-                call.respondText("$e", status = HttpStatusCode.InternalServerError)
+              call.respond(
+                  HttpStatusCode.OK,
+                  mapOf(
+                      "success" to true,
+                      "message" to "Berhasil Register"
+                  )
+              )
+
+                call.respond(
+                    HttpStatusCode.BadRequest,
+                    mapOf(
+                        "success" to false,
+                        "message" to "gagal"
+                    )
+                )
             }
         }
     }
