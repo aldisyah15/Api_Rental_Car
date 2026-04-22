@@ -1,5 +1,6 @@
 package com.example.routing
 
+import com.example.model.ApiResponse
 import com.example.model.Login
 import com.example.model.Register
 import com.example.repository.auth.SupabaseAuthRepo
@@ -21,17 +22,17 @@ fun Route.authRouting() {
 
             call.respond(
                 HttpStatusCode.OK,
-                mapOf(
-                    "success" to true,
-                    "message" to "Berhasil Register"
+                ApiResponse(
+                    success = true,
+                    message = "Berhasil"
                 )
             )
 
             call.respond(
                 HttpStatusCode.BadRequest,
-                mapOf(
-                    "success" to false,
-                    "message" to "gagal"
+                ApiResponse(
+                    success = false,
+                    message = "Gagal"
                 )
             )
         }
