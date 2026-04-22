@@ -18,7 +18,22 @@ fun Route.authRouting() {
         post("/register") {
             val dataRegisterBaru = call.receive<Register>()
             SupabaseAuthRepo().register(dataRegisterBaru)
-            call.respondText("Berhasil menambahkan ke database!", status = HttpStatusCode.Created)
+
+            call.respond(
+                HttpStatusCode.OK,
+                mapOf(
+                    "success" to true,
+                    "message" to "Berhasil Register"
+                )
+            )
+
+            call.respond(
+                HttpStatusCode.BadRequest,
+                mapOf(
+                    "success" to false,
+                    "message" to "gagal"
+                )
+            )
         }
 
         post("/login"){
@@ -28,21 +43,7 @@ fun Route.authRouting() {
                 println(dataLogin)
                 call.respondText("Berhasil Login", status = HttpStatusCode.OK)
             } catch (e: Exception) {
-              call.respond(
-                  HttpStatusCode.OK,
-                  mapOf(
-                      "success" to true,
-                      "message" to "Berhasil Register"
-                  )
-              )
 
-                call.respond(
-                    HttpStatusCode.BadRequest,
-                    mapOf(
-                        "success" to false,
-                        "message" to "gagal"
-                    )
-                )
             }
         }
     }
