@@ -15,11 +15,11 @@ fun main(args: Array<String>) {
 
     val port = System.getenv("PORT")?.toInt() ?: 8080
 
+    io.ktor.server.netty.EngineMain.main(args)
     embeddedServer(Netty, port = port, host = "0.0.0.0") {
-        install(ContentNegotiation) {
+        install(io.ktor.server.plugins.contentnegotiation.ContentNegotiation) {
             json()
         }
-        module()
     }.start(wait = true)
 }
 
