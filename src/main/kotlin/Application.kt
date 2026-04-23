@@ -11,22 +11,19 @@ import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.cors.routing.*
 
+// main.kt
 fun main(args: Array<String>) {
-
-    val port = System.getenv("PORT")?.toInt() ?: 8080
-
+    // Biarkan EngineMain yang bekerja karena kamu sudah setting YAML & Docker dengan benar
     io.ktor.server.netty.EngineMain.main(args)
-    embeddedServer(Netty, port = port, host = "0.0.0.0") {
-        install(io.ktor.server.plugins.contentnegotiation.ContentNegotiation) {
-            json()
-        }
-    }.start(wait = true)
 }
 
+// Application.kt
 fun Application.module() {
+    // Ambil blok "jwt"
     val jwt = environment.config.config("jwt")
+
     val config = JwtConfig(
-        realm = jwt.property("relm").getString(),
+        realm = jwt.property("realm").getString(),
         secret = jwt.property("secret").getString(),
         audience = jwt.property("audience").getString(),
         expiry = jwt.property("expiry").getString().toLong(),
@@ -39,6 +36,7 @@ fun Application.module() {
         allowMethod(HttpMethod.Post)
         allowHeader(HttpHeaders.ContentType)
     }
+
     configureSerialization()
     configureJwtAuthtentication(config)
     configureRouting(config)
