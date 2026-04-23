@@ -8,6 +8,7 @@ data class ApiResponse(
     val message: String
 )
 
+@Serializable
 data class ApiResponseToken(
     val success: Boolean,
     val message: String,
