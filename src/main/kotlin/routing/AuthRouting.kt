@@ -50,10 +50,9 @@ fun Route.authRouting(config: JwtConfig) {
         }
 
         post("/login"){
-
                 val dataLogin = call.receive<Login>()
                 SupabaseAuthRepo().login(dataLogin)
-                println(dataLogin)
+                val token = generateToken(config, dataLogin.email)
                 call.respond(
                     HttpStatusCode.OK,
                     ApiResponse(
