@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Brand_car(
-    val name: String,
-    val logo: String
+    val brand_name: String,
+    val url_logo: String
 )
