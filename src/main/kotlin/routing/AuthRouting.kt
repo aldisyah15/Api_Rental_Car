@@ -73,14 +73,14 @@ fun Route.authRouting(config: JwtConfig) {
 
 
     }
-
-    authenticate("jwt-auth") {
-        route("/car") {
-            get("/brands") {
-val principal = call.principal<JWTPrincipal>()
-                val email = principal?.payload?.getClaim("email")?.asString()
-                call.respondText("hello, ${email}")
-            }
-        }
-    }
+//
+//    authenticate("jwt-auth") {
+//        route("/car") {
+//            get("/brands") {
+//val principal = call.principal<JWTPrincipal>()
+//                val email = principal?.payload?.getClaim("email")?.asString()
+//                call.respondText("hello, ${email}")
+//            }
+//        }
+//    }
 }
