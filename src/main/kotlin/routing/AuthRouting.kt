@@ -66,7 +66,7 @@ fun Route.authRouting(config: JwtConfig) {
                 HttpStatusCode.BadRequest,
                 ApiResponse(
                     false,
-                    "Email or Password wrong"
+                    "Token tidak valid"
                 )
             )
 
