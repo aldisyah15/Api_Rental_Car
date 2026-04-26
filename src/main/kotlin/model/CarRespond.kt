@@ -2,6 +2,7 @@ package com.example.model
 
 import kotlinx.serialization.Serializable
 
+@Serializable
 data class CarRespond(
     val id_car: Int,
     val brand_name: String,
