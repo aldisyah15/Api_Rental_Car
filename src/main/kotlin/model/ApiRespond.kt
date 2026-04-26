@@ -15,3 +15,10 @@ data class ApiResponseToken(
     val token: String
 
 )
+
+
+@Serializable
+data class ApiRespondCar<T>(
+    val succes: Boolean,
+    val data: List<T>
+)
