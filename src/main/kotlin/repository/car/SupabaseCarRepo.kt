@@ -11,4 +11,8 @@ class SupabaseCarRepo() {
         return bucket
 
     }
+
+    suspend fun getCars() {
+
+    }
 }
