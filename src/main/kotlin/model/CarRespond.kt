@@ -7,7 +7,7 @@ data class CarRespond(
     val id_car: Int,
     val brand_name: String,
     val url_logo: String,
-    val rental_price: String,
+    val rental_price: Int,
     val horse_power: String,
     val transmission: String,
     val vehicle_photo: String,
@@ -15,4 +15,5 @@ data class CarRespond(
     val sales_name : String,
     val sales_photo: String,
     val contact_number_whatsapp: String
+
 )
