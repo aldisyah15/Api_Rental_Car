@@ -1,7 +1,6 @@
 package com.example.routing.car
 
 import com.example.model.ApiRespondCar
-import com.example.model.Brand_car
 import com.example.model.CarRespond
 import com.example.repository.car.SupabaseCarRepo
 import io.ktor.http.HttpStatusCode
@@ -9,17 +8,12 @@ import io.ktor.http.content.PartData
 import io.ktor.http.content.forEachPart
 import io.ktor.http.content.streamProvider
 import io.ktor.server.auth.authenticate
-import io.ktor.server.auth.jwt.JWTPrincipal
-import io.ktor.server.auth.principal
 import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
-import io.ktor.util.valuesOf
-import io.ktor.utils.io.readByte
-import io.ktor.utils.io.readByteArray
 
 fun Route.CarRouting() {
     authenticate("jwt-auth") {
@@ -50,16 +44,28 @@ fun Route.CarRouting() {
                             if (part.name == "rental_price") rental_price = part.value
                             if (part.name == "horse_power") horse_power = part.value
                             if (part.name == "transmission") transmission = part.value
-                            if (part.name == "vehicle_photo") vehicle_photo = part.value
                             if (part.name == "sales_name") sales_name = part.value
-                            if (part.name == "sales_photo") sales_photo = part.value
                             if (part.name == "contact_number_whatsapp") contact_number_whatsapp = part.value
                         }
 
-                        is PartData.FileItem -> {
-                            if (part.name == "url_logo") url_logo = part
+                        is PartData.FileItem ->  {
                             val fileName = "${System.currentTimeMillis()}-${part.originalFileName}"
                             val fileBytes = part.streamProvider().readBytes()
+
+                            when(part.name) {
+                                "url_logo" -> {
+                                    fileName_url_logo = fileName
+                                    url_logo = fileBytes
+                                }
+                                "sales_photo" -> {
+                                    fileName_sales_photo = fileName
+                                    sales_photo = fileBytes
+                                }
+                                "vehicle_photo" -> {
+                                    fileName_vehicle_photo = fileName
+                                    vehicle_photo = vehicle_photo
+                                }
+                            }
                         }
 
                         else -> part.dispose
@@ -80,7 +86,7 @@ fun Route.CarRouting() {
                         vehicle_photo = fileName_vehicle_photo, // url
                         id_car = null
                     )
-                    res.postCar(fileName = fileName, filebytes = fileBytes, newCar = carObject)
+                    res.postCar(url_logo_fileName = fileName_url_logo, sales_photo_fileName = sales_name, vehicle_photo_FileName = fileName_vehicle_photo, url_logo_byte = url_logo, sales_photo_Byte = sales_photo, vehicle_photo_Byte = vehicle_photo, newCar = carObject)
                 }
             }
 
