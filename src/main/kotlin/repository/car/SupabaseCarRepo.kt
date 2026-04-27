@@ -23,7 +23,7 @@ class SupabaseCarRepo() {
         url_logo_fileName: String, url_logo_byte: ByteArray?, sales_photo_fileName: String, sales_photo_Byte: ByteArray?,
         vehicle_photo_FileName: String, vehicle_photo_Byte: ByteArray?, newCar: CarRespond
     ) {
-        val bucket = supabase.storage.from("car")
+        val bucket = supabase.storage.from("car_photo")
         if (url_logo_byte != null) {
             bucket.upload(url_logo_fileName, url_logo_byte)
         }
