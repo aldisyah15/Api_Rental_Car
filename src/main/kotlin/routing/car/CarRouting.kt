@@ -1,8 +1,10 @@
 package com.example.routing.car
 
+import com.example.database.supabase
 import com.example.model.ApiRespondCar
 import com.example.model.CarRespond
 import com.example.repository.car.SupabaseCarRepo
+import io.github.jan.supabase.storage.storage
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.PartData
 import io.ktor.http.content.forEachPart
@@ -29,6 +31,7 @@ fun Route.CarRouting() {
                 var detail = ""
                 var sales_name = ""
                 var contact_number_whatsapp = ""
+
                 var url_logo: ByteArray? = null
                 var fileName_url_logo = ""
 
@@ -49,44 +52,28 @@ fun Route.CarRouting() {
                         }
 
                         is PartData.FileItem ->  {
-                            val fileName = part.originalFileName ?: "image.jpg"
+                            // Proses upload ke Supabase Storage
+                            val fileName = "${System.currentTimeMillis()}-${part.originalFileName}"
                             val fileBytes = part.streamProvider().readBytes()
 
-                            when(part.name) {
-                                "url_logo" -> {
-                                    fileName_url_logo = fileName
-                                    url_logo = fileBytes
-                                }
-                                "sales_photo" -> {
-                                    fileName_sales_photo = fileName
-                                    sales_photo = fileBytes
-                                }
-                                "vehicle_photo" -> {
-                                    fileName_vehicle_photo = fileName
-                                    vehicle_photo = vehicle_photo
-                                }
+                            val bucket = supabase.storage.from("car-bucket")
+                            bucket.upload(fileName, fileBytes)
+                            val publicUrl = bucket.publicUrl(fileName)
+
+                            if (part.name == "vehicle_photo") {
+                                fileName_vehicle_photo = publicUrl
+                            } else if (part.name == "url_logo") {
+                                fileName_url_logo = publicUrl
+                            }else if (part.name == "sales_photo"){
+                                fileName_sales_photo = publicUrl
                             }
                         }
-
-                        else -> part.dispose
+                        else -> part.dispose()
                     }
                 }
 
-                if (url_logo != null || sales_photo != null || vehicle_photo != null) {
-                    val carObject = CarRespond(
-                        brand_name = brand_name,
-                        url_logo = fileName_url_logo, //url
-                        rental_price = rental_price.toInt(),
-                        contact_number_whatsapp = contact_number_whatsapp,
-                        detail = detail,
-                        horse_power = horse_power,
-                        sales_name = sales_name,
-                        sales_photo = fileName_sales_photo, //url
-                        transmission = transmission,
-                        vehicle_photo = fileName_vehicle_photo, // url
-                        id_car = null
-                    )
-                    res.postCar(url_logo_fileName = fileName_url_logo, sales_photo_fileName = sales_name, vehicle_photo_FileName = fileName_vehicle_photo, url_logo_byte = url_logo, sales_photo_Byte = sales_photo, vehicle_photo_Byte = vehicle_photo, newCar = carObject)
+                call.respond(HttpStatusCode.Created, "Data Berhasil Disimpan")
+
                 }
             }
 
@@ -115,4 +102,3 @@ fun Route.CarRouting() {
             }
         }
     }
-}
