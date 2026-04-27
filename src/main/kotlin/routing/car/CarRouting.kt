@@ -49,7 +49,7 @@ fun Route.CarRouting() {
                         }
 
                         is PartData.FileItem ->  {
-                            val fileName = "${System.currentTimeMillis()}-${part.originalFileName}"
+                            val fileName = part.originalFileName ?: "image.jpg"
                             val fileBytes = part.streamProvider().readBytes()
 
                             when(part.name) {
