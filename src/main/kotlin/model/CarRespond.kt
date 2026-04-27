@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CarRespond(
-    val id_car: Int,
+    val id_car: Int?,
     val brand_name: String,
     val url_logo: String,
     val rental_price: Int,
