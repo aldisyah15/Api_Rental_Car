@@ -11,15 +11,11 @@ import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.cors.routing.*
 
-// main.kt
 fun main(args: Array<String>) {
-    // Biarkan EngineMain yang bekerja karena kamu sudah setting YAML & Docker dengan benar
     io.ktor.server.netty.EngineMain.main(args)
 }
 
-// Application.kt
 fun Application.module() {
-    // Ambil blok "jwt"
     val jwt = environment.config.config("jwt")
 
     val config = JwtConfig(
