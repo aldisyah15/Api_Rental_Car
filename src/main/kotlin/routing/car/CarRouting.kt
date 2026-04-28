@@ -67,7 +67,7 @@ fun Route.CarRouting() {
                     val dataToInsert = mapOf(
                         "brand_name" to brand_name,
                         "url_logo" to fileName_url_logo, // Gunakan URL hasil upload, bukan nama file
-                        "rental_price" to rental_price.toIntOrNull(),
+                        "rental_price" to (rental_price.toIntOrNull() ?: 0),
                         "horse_power" to horse_power,
                         "transmission" to transmission,
                         "vehicle_photo" to fileName_vehicle_photo,
