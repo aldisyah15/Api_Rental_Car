@@ -64,7 +64,7 @@ fun Route.CarRouting() {
                     }
 
                     if (fileBytes != null) {
-                        val bucket = supabase.storage.from("car-bucket")
+                        val bucket = supabase.storage.from("car_photo")
                         bucket.upload(fileName, fileBytes)
                         val publicUrl = bucket.publicUrl(fileName)
 
