@@ -18,6 +18,8 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 
 fun Route.CarRouting() {
     authenticate("jwt-auth") {
@@ -76,18 +78,18 @@ fun Route.CarRouting() {
                 }
 
                 // 2. DI LUAR LOOP: Baru lakukan insert ke database
-                val dataToInsert = mapOf(
-                    "brand_name" to brand_name,
-                    "url_logo" to url_logo_url,
-                    "rental_price" to (rental_price.toIntOrNull() ?: 0),
-                    "horse_power" to horse_power,
-                    "transmission" to transmission,
-                    "vehicle_photo" to vehicle_photo_url,
-                    "detail" to detail,
-                    "sales_name" to sales_name,
-                    "sales_photo" to sales_photo_url,
-                    "contact_number_whatsapp" to contact_number_whatsapp
-                )
+                val dataToInsert = buildJsonObject {
+                    put("brand_name", brand_name)
+                    put("url_logo", url_logo_url)
+                    put("rental_price", rental_price.toIntOrNull() ?: 0)
+                    put("horse_power", horse_power)
+                    put("transmission", transmission)
+                    put("vehicle_photo", vehicle_photo_url)
+                    put("detail", detail)
+                    put("sales_name", sales_name)
+                    put("sales_photo", sales_photo_url)
+                    put("contact_number_whatsapp", contact_number_whatsapp)
+                }
 
                 println("Final Data to Insert: $dataToInsert")
 
