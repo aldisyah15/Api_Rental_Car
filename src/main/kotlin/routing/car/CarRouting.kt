@@ -101,9 +101,9 @@ fun Route.CarRouting() {
                     } else {
                         call.respond(
                             HttpStatusCode.BadRequest,
-                            ApiRespondCar(
-                                succes = false,
-                                data = dataToInsert.toList()
+                            ApiResponse(
+                                success = false,
+                                message = "ssss"
                             )
                         )
                     }
