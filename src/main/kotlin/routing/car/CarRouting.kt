@@ -76,20 +76,22 @@ fun Route.CarRouting() {
                             fileName_sales_photo = publicUrl
                         }
 
-                        val newCar = CarRespond(
-                            id_car = null,
-                            brand_name = brand_name,
-                            url_logo = fileName_url_logo,
-                            rental_price = rental_price.toInt(),
-                            horse_power = horse_power,
-                            transmission = transmission,
-                            vehicle_photo = fileName_vehicle_photo,
-                            detail = detail,
-                            sales_name = sales_name,
-                            sales_photo = fileName_sales_photo,
-                            contact_number_whatsapp = contact_number_whatsapp,
+                        // Buat map berisi data tanpa menyertakan id_car
+                        val dataToInsert = mapOf(
+                            "brand_name" to brand_name,
+                            "url_logo" to fileName_url_logo, // Gunakan URL hasil upload, bukan nama file
+                            "rental_price" to rental_price.toInt(),
+                            "horse_power" to horse_power,
+                            "transmission" to transmission,
+                            "vehicle_photo" to fileName_vehicle_photo,
+                            "detail" to detail,
+                            "sales_name" to sales_name,
+                            "sales_photo" to fileName_sales_photo,
+                            "contact_number_whatsapp" to contact_number_whatsapp
                         )
-                        supabase.from("car").insert(newCar)
+
+                        supabase.from("car").insert(dataToInsert)
+
                         call.respond(HttpStatusCode.Created, "Berhasil simpan mobil dengan foto!")
                     } else {
                         call.respond(HttpStatusCode.BadRequest, "File foto tidak ditemukan")
