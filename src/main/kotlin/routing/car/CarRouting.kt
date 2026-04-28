@@ -2,6 +2,7 @@ package com.example.routing.car
 
 import com.example.database.supabase
 import com.example.model.ApiRespondCar
+import com.example.model.ApiResponse
 import com.example.model.CarRespond
 import com.example.repository.car.SupabaseCarRepo
 import io.github.jan.supabase.postgrest.from
@@ -63,6 +64,19 @@ fun Route.CarRouting() {
                         else -> part.dispose()
                     }
 
+                    val dataToInsert = mapOf(
+                        "brand_name" to brand_name,
+                        "url_logo" to fileName_url_logo, // Gunakan URL hasil upload, bukan nama file
+                        "rental_price" to rental_price.toInt(),
+                        "horse_power" to horse_power,
+                        "transmission" to transmission,
+                        "vehicle_photo" to fileName_vehicle_photo,
+                        "detail" to detail,
+                        "sales_name" to sales_name,
+                        "sales_photo" to fileName_sales_photo,
+                        "contact_number_whatsapp" to contact_number_whatsapp
+                    )
+
                     if (fileBytes != null) {
                         val bucket = supabase.storage.from("car_photo")
                         bucket.upload(fileName, fileBytes)
@@ -77,24 +91,18 @@ fun Route.CarRouting() {
                         }
 
                         // Buat map berisi data tanpa menyertakan id_car
-                        val dataToInsert = mapOf(
-                            "brand_name" to brand_name,
-                            "url_logo" to fileName_url_logo, // Gunakan URL hasil upload, bukan nama file
-                            "rental_price" to rental_price.toInt(),
-                            "horse_power" to horse_power,
-                            "transmission" to transmission,
-                            "vehicle_photo" to fileName_vehicle_photo,
-                            "detail" to detail,
-                            "sales_name" to sales_name,
-                            "sales_photo" to fileName_sales_photo,
-                            "contact_number_whatsapp" to contact_number_whatsapp
-                        )
+
 
                         supabase.from("car").insert(dataToInsert)
 
                         call.respond(HttpStatusCode.Created, "Berhasil simpan mobil dengan foto!")
                     } else {
-                        call.respond(HttpStatusCode.BadRequest, "File foto tidak ditemukan")
+                        call.respond(
+                            ApiRespondCar(
+                                succes = false,
+                                data = dataToInsert.toList()
+                            )
+                        )
                     }
                 }
                 }
