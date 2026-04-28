@@ -77,6 +77,8 @@ fun Route.CarRouting() {
                         "contact_number_whatsapp" to contact_number_whatsapp
                     )
 
+                    println(dataToInsert)
+
                     if (fileBytes != null) {
                         val bucket = supabase.storage.from("car_photo")
                         bucket.upload(fileName, fileBytes)
