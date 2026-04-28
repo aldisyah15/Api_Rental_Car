@@ -25,7 +25,9 @@ fun Route.CarRouting() {
 
             post("/") {
                 val res = SupabaseCarRepo()
-                var multipart = call.receiveMultipart()
+                val multipart = call.receiveMultipart()
+
+                // Penampung data
                 var brand_name = ""
                 var rental_price = ""
                 var horse_power = ""
@@ -34,81 +36,72 @@ fun Route.CarRouting() {
                 var sales_name = ""
                 var contact_number_whatsapp = ""
 
-                var url_logo: ByteArray? = null
-                var fileName_url_logo = ""
+                var url_logo_url = ""
+                var sales_photo_url = ""
+                var vehicle_photo_url = ""
 
-                var sales_photo: ByteArray? = null
-                var fileName_sales_photo = ""
-
-                var vehicle_photo: ByteArray? = null
-                var fileName_vehicle_photo = ""
-
-                var fileName = ""
-                var fileBytes: ByteArray? = null
+                // 1. LOOP PERTAMA: Kumpulkan semua data dan upload file
                 multipart.forEachPart { part ->
                     when (part) {
                         is PartData.FormItem -> {
-                            if (part.name == "brand_name") brand_name = part.value
-                            if (part.name == "rental_price") rental_price = part.value
-                            if (part.name == "horse_power") horse_power = part.value
-                            if (part.name == "transmission") transmission = part.value
-                            if (part.name == "sales_name") sales_name = part.value
-                            if (part.name == "contact_number_whatsapp") contact_number_whatsapp = part.value
+                            when (part.name) {
+                                "brand_name" -> brand_name = part.value
+                                "rental_price" -> rental_price = part.value
+                                "horse_power" -> horse_power = part.value
+                                "transmission" -> transmission = part.value
+                                "sales_name" -> sales_name = part.value
+                                "contact_number_whatsapp" -> contact_number_whatsapp = part.value
+                                "detail" -> detail = part.value
+                            }
                         }
+                        is PartData.FileItem -> {
+                            val fileName = "${System.currentTimeMillis()}-${part.originalFileName}"
+                            val fileBytes = part.streamProvider().readBytes()
 
-                        is PartData.FileItem ->  {
-                            // Proses upload ke Supabase Storage
-                            fileName = "${System.currentTimeMillis()}-${part.originalFileName}"
-                            fileBytes = part.streamProvider().readBytes()
+                            // Langsung upload ke storage begitu file didapat
+                            val bucket = supabase.storage.from("car_photo")
+                            bucket.upload(fileName, fileBytes)
+                            val publicUrl = bucket.publicUrl(fileName)
+
+                            // Simpan URL-nya ke variabel yang tepat
+                            when (part.name) {
+                                "url_logo" -> url_logo_url = publicUrl
+                                "sales_photo" -> sales_photo_url = publicUrl
+                                "vehicle_photo" -> vehicle_photo_url = publicUrl
+                            }
                         }
                         else -> part.dispose()
                     }
+                    part.dispose()
+                }
 
-                    val dataToInsert = mapOf(
-                        "brand_name" to brand_name,
-                        "url_logo" to fileName_url_logo, // Gunakan URL hasil upload, bukan nama file
-                        "rental_price" to (rental_price.toIntOrNull() ?: 0),
-                        "horse_power" to horse_power,
-                        "transmission" to transmission,
-                        "vehicle_photo" to fileName_vehicle_photo,
-                        "detail" to detail,
-                        "sales_name" to sales_name,
-                        "sales_photo" to fileName_sales_photo,
-                        "contact_number_whatsapp" to contact_number_whatsapp
-                    )
+                // 2. DI LUAR LOOP: Baru lakukan insert ke database
+                val dataToInsert = mapOf(
+                    "brand_name" to brand_name,
+                    "url_logo" to url_logo_url,
+                    "rental_price" to (rental_price.toIntOrNull() ?: 0),
+                    "horse_power" to horse_power,
+                    "transmission" to transmission,
+                    "vehicle_photo" to vehicle_photo_url,
+                    "detail" to detail,
+                    "sales_name" to sales_name,
+                    "sales_photo" to sales_photo_url,
+                    "contact_number_whatsapp" to contact_number_whatsapp
+                )
 
-                    println(dataToInsert)
+                println("Final Data to Insert: $dataToInsert")
 
-                    if (fileBytes != null) {
-                        val bucket = supabase.storage.from("car_photo")
-                        bucket.upload(fileName, fileBytes)
-                        val publicUrl = bucket.publicUrl(fileName)
-
-                        if (part.name == "vehicle_photo") {
-                            fileName_vehicle_photo = publicUrl
-                        } else if (part.name == "url_logo") {
-                            fileName_url_logo = publicUrl
-                        }else if (part.name == "sales_photo"){
-                            fileName_sales_photo = publicUrl
-                        }
-
-                        // Buat map berisi data tanpa menyertakan id_car
-
-
+                try {
+                    if (brand_name.isNotEmpty()) {
                         supabase.from("car").insert(dataToInsert)
-
-                        call.respond(HttpStatusCode.Created, "Berhasil simpan mobil dengan foto!")
+                        call.respond(HttpStatusCode.Created, "Berhasil simpan mobil dan 3 foto!")
                     } else {
-                        call.respond(
-                            HttpStatusCode.BadRequest,
-                            ApiResponse(
-                                success = false,
-                                message = "ssss"
-                            )
-                        )
+                        call.respond(HttpStatusCode.BadRequest, "Data tidak lengkap")
                     }
+                } catch (e: Exception) {
+                    call.respond(HttpStatusCode.InternalServerError, "Error: ${e.message}")
                 }
-                }
+            }
             }
 
             get("/") {
