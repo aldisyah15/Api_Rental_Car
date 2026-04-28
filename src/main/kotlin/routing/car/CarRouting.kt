@@ -98,6 +98,7 @@ fun Route.CarRouting() {
                         call.respond(HttpStatusCode.Created, "Berhasil simpan mobil dengan foto!")
                     } else {
                         call.respond(
+                            HttpStatusCode.BadRequest,
                             ApiRespondCar(
                                 succes = false,
                                 data = dataToInsert.toList()
