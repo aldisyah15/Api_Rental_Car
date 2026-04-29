@@ -26,10 +26,8 @@ fun Route.CarRouting() {
         route("/cars") {
 
             post("/") {
-                val res = SupabaseCarRepo()
                 val multipart = call.receiveMultipart()
 
-                // Penampung data
                 var brand_name = ""
                 var rental_price = ""
                 var horse_power = ""
@@ -42,7 +40,6 @@ fun Route.CarRouting() {
                 var sales_photo_url = ""
                 var vehicle_photo_url = ""
 
-                // 1. LOOP PERTAMA: Kumpulkan semua data dan upload file
                 multipart.forEachPart { part ->
                     when (part) {
                         is PartData.FormItem -> {
@@ -60,12 +57,10 @@ fun Route.CarRouting() {
                             val fileName = "${System.currentTimeMillis()}-${part.originalFileName}"
                             val fileBytes = part.streamProvider().readBytes()
 
-                            // Langsung upload ke storage begitu file didapat
                             val bucket = supabase.storage.from("car_photo")
                             bucket.upload(fileName, fileBytes)
                             val publicUrl = bucket.publicUrl(fileName)
 
-                            // Simpan URL-nya ke variabel yang tepat
                             when (part.name) {
                                 "url_logo" -> url_logo_url = publicUrl
                                 "sales_photo" -> sales_photo_url = publicUrl
@@ -77,7 +72,6 @@ fun Route.CarRouting() {
                     part.dispose()
                 }
 
-                // 2. DI LUAR LOOP: Baru lakukan insert ke database
                 val dataToInsert = buildJsonObject {
                     put("brand_name", brand_name)
                     put("url_logo", url_logo_url)
